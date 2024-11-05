@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     triggers {
-        pollSCM('H/5 * * * *')  // Überprüft alle 5 Minuten auf Änderungen
+        pollSCM('* * * * *')   // Überprüft alle 5 Minuten auf Änderungen im Repository
     }
 
     stages {
@@ -14,8 +14,15 @@ pipeline {
         
         stage('Build') {
             steps {
-                echo 'Building the application...'
-                sh 'echo "Build completed"'  // Simuliert den Build-Schritt
+                script {
+                    if (fileExists('hello.sh')) {
+                        echo 'hello.sh file found. Proceeding with the build...'
+                        sh 'chmod +x hello.sh'  // Macht das Skript ausführbar, falls notwendig
+                        sh './hello.sh'  // Führt das hello.sh-Skript aus
+                    } else {
+                        echo 'hello.sh file not found. Skipping the build.'
+                    }
+                }
             }
         }
 
